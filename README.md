@@ -13,55 +13,100 @@ For further information please refer the official [documentation](https://docs.m
 sudo apt-get update # Fetches the list of available updates
 sudo apt-get upgrade # Strictly upgrades the current packages
 
-sudo apt install apt-transport-https
-sudo apt install software-properties-common
+sudo apt install apt-transport-https software-properties-common wget
 sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get -y install oracle-java8-installer
 
 java -version
 #sudo apt install default-jre
-wget https://github.com/mir-one/node/releases/download/v1.0.3/mir-node_1.0.3.deb
+wget https://github.com/dei-s/node/releases/download/v1.0.3/mir-node_1.0.3.deb
 sudo dpkg -i mir-node_1.0.3.deb
+```
+
+## ARM
+
+```
+apt install vim screen libleveldb-java libleveldb-api-java
+wget http://central.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.3/httpcore-4.4.3.jar
+wget http://central.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.1/httpclient-4.5.1.jar
+mv httpcore-4.4.3.jar /usr/share/mir/lib
+mv httpclient-4.5.1.jar /usr/share/mir/lib
+```
+
+nano /usr/bin/mir
+удалить и строки 345
+`$lib_dir/org.ethereum.leveldbjni-all-1.18.3.jar`
+и вставить
+`/usr/share/java/leveldb-api.jar:/usr/share/java/leveldb.jar:$lib_dir/httpcore-4.4.3.jar:$lib_dir/httpclient-4.5.1.jar`
+
+
+## Config
+
+```
 sudo nano /usr/share/mir/conf/mir.conf
 ```
 
 ```
-miner {
-   # Enable/disable block generation
-   enable = yes
+mir {
+  ...
+  miner {
+    # Enable/disable block generation
+    enable = yes
 
-   # Required number of connections (both incoming and outgoing) to attempt block generation. Setting this value to 0
-   # enables "off-line generation".
-   quorum = 2
+    # Required number of connections (both incoming and outgoing) to attempt block generation. Setting this value to 0
+    # enables "off-line generation".
+    quorum = 2
 
-   # Enable block generation only in the last block if not older the given period of time
-   interval-after-last-block-then-generation-is-allowed = 1d
+    # Enable block generation only in the last block if not older the given period of time
+    interval-after-last-block-then-generation-is-allowed = 1d
 
-   # Interval between microblocks
-   micro-block-interval = 5s
+    # Interval between microblocks
+    micro-block-interval = 5s
 
-   # Mininmum time interval between blocks
-   minimal-block-generation-offset = 1001ms
+    # Mininmum time interval between blocks
+    minimal-block-generation-offset = 1001ms
 
-   # Max amount of transactions in key block
-   max-transactions-in-key-block = 0
+    # Max amount of transactions in key block
+    max-transactions-in-key-block = 0
 
-   # Max amount of transactions in micro block
-   max-transactions-in-micro-block = 255
+    # Max amount of transactions in micro block
+    max-transactions-in-micro-block = 255
 
-   # Miner references the best microblock which is at least this age
-   min-micro-block-age = 6s
- }
+    # Miner references the best microblock which is at least this age
+    min-micro-block-age = 6s
+  }
+}
 ```
 
+## Run
+
+Start as program:
+
+```
+mir /usr/share/mir/conf/mir.conf
+```
+
+Enable service:
+
+```
 sudo systemctl enable mir.service
+```
+
+Start as service:
+
+```
 sudo systemctl start mir.service
+```
 or
+```
 sudo service mir start
+```
 
 **juornal**
+```
 sudo journalctl -u mir.service -f
+```
 
 
 ## Compiling Packages from source
